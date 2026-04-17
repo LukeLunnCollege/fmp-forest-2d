@@ -15,9 +15,11 @@ public class PlayerMovement : MonoBehaviour
     private float horizontalInput;
     private bool isGrounded;
 
+    private Animator animator;
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -31,9 +33,23 @@ public class PlayerMovement : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
 
+
         // 3. Flip Sprite Logic (Optional)
         FlipSprite();
+
+        {
+            float moveInput = Input.GetAxis("Horizontal");
+            rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
+
+            if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            }
+
+            SetAnimation(moveInput);
+        }
     }
+
 
     void FixedUpdate()
     {
@@ -48,5 +64,31 @@ public class PlayerMovement : MonoBehaviour
     {
         if (horizontalInput > 0) transform.localScale = new Vector3(1, 1, 1);
         else if (horizontalInput < 0) transform.localScale = new Vector3(-1, 1, 1);
+    }
+    private void SetAnimation(float moveInput)
+
+    {
+        if (isGrounded)
+        {
+            if (moveInput == 0)
+            {
+                animator.Play("Player_Idle");
+            }
+            else
+            {
+                animator.Play("Player_Run");
+            }
+        }
+        else
+        {
+            if(rb.linearVelocityY < 0)
+            {
+                animator.Play("Player_Jump");
+            }
+            else
+            {
+                animator.Play("Player_Fall");
+            }
+        }
     }
 }
