@@ -10,16 +10,22 @@ public class PlayerMovement : MonoBehaviour
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
     public LayerMask groundLayer;
+   
 
     private Rigidbody2D rb;
     private float horizontalInput;
     private bool isGrounded;
 
     private Animator animator;
+
+    public int extraJumpValue = 1;
+    private int extraJumps;
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+
+        extraJumps = extraJumpValue;
     }
 
     void Update()
@@ -27,10 +33,22 @@ public class PlayerMovement : MonoBehaviour
         // 1. Get Input
         horizontalInput = Input.GetAxisRaw("Horizontal");
 
-        // 2. Jump Input
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (isGrounded)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            extraJumps = extraJumpValue;
+        }
+        // 2. Jump Input
+        if (Input.GetButtonDown("Jump"))
+        {
+            if (isGrounded)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            }
+            else if (extraJumps > 0)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+                extraJumps--;
+            }
         }
 
 
