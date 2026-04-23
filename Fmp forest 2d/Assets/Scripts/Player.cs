@@ -1,7 +1,9 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public int health = 100;
     [Header("Movement Settings")]
     public float moveSpeed = 8f;
     public float jumpForce = 12f;
@@ -18,12 +20,14 @@ public class PlayerMovement : MonoBehaviour
 
     private Animator animator;
 
+    private SpriteRenderer spriteRenderer;
     public int extraJumpValue = 1;
     private int extraJumps;
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
 
         extraJumps = extraJumpValue;
     }
@@ -108,5 +112,32 @@ public class PlayerMovement : MonoBehaviour
                 animator.Play("Player_Fall");
             }
         }
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.tag == "Damage")
+        {
+            health -= 25;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            StartCoroutine(BlinkRed());
+
+            if(health <= 0)
+            {
+                Die();
+            }
+        }
+    }
+
+    private IEnumerator BlinkRed()
+    {
+        spriteRenderer.color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        spriteRenderer.color = Color.white;
+
+    }
+
+    private void Die()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
     }
 }
