@@ -1,6 +1,6 @@
 using System.Collections;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class PlayerMovement : MonoBehaviour
 {
     public int health = 100;
@@ -12,7 +12,7 @@ public class PlayerMovement : MonoBehaviour
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
     public LayerMask groundLayer;
-   
+    public Image healthImage;
 
     private Rigidbody2D rb;
     private float horizontalInput;
@@ -69,6 +69,8 @@ public class PlayerMovement : MonoBehaviour
             }
 
             SetAnimation(moveInput);
+
+            healthImage.fillAmount = health / 100f;
         }
     }
 
