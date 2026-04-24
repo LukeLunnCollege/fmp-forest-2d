@@ -1,8 +1,9 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-public class PlayerMovement : MonoBehaviour
+public class Player : MonoBehaviour
 {
+    public int coins;
     public int health = 100;
     [Header("Movement Settings")]
     public float moveSpeed = 8f;
