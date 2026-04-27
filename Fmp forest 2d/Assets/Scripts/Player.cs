@@ -15,6 +15,9 @@ public class Player : MonoBehaviour
     public LayerMask groundLayer;
     public Image healthImage;
 
+    public AudioClip jumpClip;
+    public AudioClip hurtClip;
+
     private Rigidbody2D rb;
     private float horizontalInput;
     private bool isGrounded;
@@ -22,6 +25,9 @@ public class Player : MonoBehaviour
     private Animator animator;
 
     private SpriteRenderer spriteRenderer;
+
+    private AudioSource audioSource;
+
     public int extraJumpValue = 1;
     private int extraJumps;
     void Awake()
@@ -29,6 +35,7 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
 
         extraJumps = extraJumpValue;
     }
@@ -48,11 +55,14 @@ public class Player : MonoBehaviour
             if (isGrounded)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+                PlaySFX(jumpClip);
             }
             else if (extraJumps > 0)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
                 extraJumps--;
+                PlaySFX(jumpClip);
+
             }
         }
 
@@ -72,6 +82,11 @@ public class Player : MonoBehaviour
             SetAnimation(moveInput);
 
             healthImage.fillAmount = health / 100f;
+        }
+
+        if(transform.position.y < -6)
+        {
+            Die();
         }
     }
 
@@ -118,8 +133,9 @@ public class Player : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.tag == "Damage")
+        if (collision.gameObject.tag == "Damage")
         {
+            PlaySFX(hurtClip);
             health -= 25;
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             StartCoroutine(BlinkRed());
@@ -142,5 +158,12 @@ public class Player : MonoBehaviour
     private void Die()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
+    }
+
+    public void PlaySFX(AudioClip audioClip, float volume = 1f)
+    {
+        audioSource.clip = audioClip;
+        audioSource.volume = volume;
+        audioSource.Play();
     }
 }
